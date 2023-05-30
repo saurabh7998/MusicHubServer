@@ -23,11 +23,10 @@ app.use(express.json())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 
-
 const client_id = '4a89680f85b44ea0931efc1d24e59460';
 const client_secret = '0e5fe65837bd470f9b612a36e0895db6';
 
-app.post("/authenticate", (req, res) => {
+app.post("/api/authenticate", (req, res) => {
     const authOptions = {
         url: 'https://accounts.spotify.com/api/token',
         headers: {
@@ -44,16 +43,13 @@ app.post("/authenticate", (req, res) => {
     request.post(authOptions, function (error, response, body) {
         if (!error && response.statusCode === 200) {
             const token = body.access_token;
-            // res.json({
-            //              accessToken: token
-            //          })
             res.json({
-                'token': token
+                         'token': token
                      })
         }
     });
-})
 
+})
 
 app.listen(4000)
 
