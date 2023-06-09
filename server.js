@@ -1,17 +1,16 @@
 import express from "express"
-import cors from "cors"
 import bodyParser from "body-parser";
+import cors from "cors"
 import request from 'request'
+import dotenv from 'dotenv'
+import mongoose from "mongoose";
+import userController from "./controllers/user/userController.js";
 
-const options = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 5000,
-    autoIndex: false,
-    maxPoolSize: 10,
-    socketTimeoutMS: 45000,
-    family: 4
-}
+const port = process.env.PORT || 4000;
+
+dotenv.config()
+
+mongoose.connect(process.env.MONGO_URI);
 
 const app = express()
 
@@ -23,8 +22,8 @@ app.use(express.json())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 
-const client_id = '4a89680f85b44ea0931efc1d24e59460';
-const client_secret = '0e5fe65837bd470f9b612a36e0895db6';
+const client_id = process.env.CLIENT_ID;
+const client_secret = process.env.CLIENT_SECRET;
 
 app.post("/api/authenticate", (req, res) => {
     const authOptions = {
@@ -51,7 +50,9 @@ app.post("/api/authenticate", (req, res) => {
 
 })
 
-app.listen(4000)
+userController(app)
+
+app.listen(port)
 
 
 
