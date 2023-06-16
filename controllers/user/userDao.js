@@ -8,4 +8,28 @@ export const findUserByEmail = async ({email}) => {
     return res;
 }
 
-export const findUserById = async  (id) => (await userModel.findOne({_id: id}));
+export const findUserById = async (id) => (await userModel.findOne({_id: id}));
+
+export const findLikedTracksByUser = async (userId) => {
+    try {
+        const user = await userModel.findById(userId).populate('likedTracks');
+        return user.likedTracks;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+export const addLikedSongToUser = async (userId, likedSong) => {
+    try {
+        const user = await userModel.findById(userId);
+
+        if (!user) {
+            throw new Error("User not found");
+        }
+        user.likedTracks.push(likedSong);
+        await user.save();
+        return user;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};

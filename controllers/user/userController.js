@@ -3,11 +3,31 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import asyncHandler from 'express-async-handler'
 import {protect} from "../../middleware/authMiddleware.js";
+import * as likedSongDao from "../likedSong/likedSongDao.js";
 
 const UsersController = (app) => {
     app.post('/api/user/', registerUser)
     app.post('/api/user/login', loginUser)
     app.get('/api/user/me', protect, getMe)
+
+    app.post('/api/user/likedSongs', getLikedTracks);
+    app.post('/api/user/like', addLikedTrack);
+
+}
+
+const addLikedTrack = async (req, res) => {
+    const {userId} = req.body;
+    const {likedTrackId} = req.body;
+    const existingTrack = await likedSongDao.findLikedTrack(
+        {trackId: likedTrackId});
+    const results = await userDao.addLikedSongToUser(userId, existingTrack);
+    return res.json(results);
+}
+
+const getLikedTracks = async (req, res) => {
+    const {userId} = req.body;
+    const results = await userDao.findLikedTracksByUser(userId);
+    return res.json(results);
 }
 
 // @desc    Register new user
@@ -38,6 +58,7 @@ const registerUser = asyncHandler(async (req, res) => {
                                               name,
                                               email,
                                               password: hashedPassword,
+                                              likedTracks: []
                                           })
 
     if (user) {

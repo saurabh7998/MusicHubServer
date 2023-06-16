@@ -5,6 +5,8 @@ import request from 'request'
 import dotenv from 'dotenv'
 import mongoose from "mongoose";
 import userController from "./controllers/user/userController.js";
+import likedSongController
+    from "./controllers/likedSong/likedSongController.js";
 
 const port = process.env.PORT || 4000;
 
@@ -50,7 +52,8 @@ app.post("/api/authenticate", (req, res) => {
 
 })
 
-userController(app)
+userController(app);
+likedSongController(app);
 
 app.listen(port)
 

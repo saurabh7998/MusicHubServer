@@ -15,6 +15,12 @@ const userSchema = mongoose.Schema(
             type: String,
             required: [true, 'Please add a password'],
         },
+        likedTracks: {
+            type: [{
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'LikedSongModel'
+            }],
+        }
     },
     {
         timestamps: true,
