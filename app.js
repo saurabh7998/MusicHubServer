@@ -12,7 +12,17 @@ const port = process.env.PORT || 4000;
 
 dotenv.config()
 
-mongoose.connect(process.env.MONGO_URI);
+// mongoose.connect(process.env.MONGO_URI);
+const connectToDatabase = async () => {
+    try {
+        await mongoose.connect(process.env.MONGO_URI);
+        console.log('Connected to MongoDB');
+    } catch (error) {
+        console.error('Error connecting to MongoDB:', error);
+    }
+};
+
+await connectToDatabase();
 
 const app = express()
 
