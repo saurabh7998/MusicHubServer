@@ -22,9 +22,13 @@ export const findLikedTracksByUser = async (userId) => {
 export const addLikedSongToUser = async (userId, likedSong) => {
     try {
         const user = await userModel.findById(userId);
-
         if (!user) {
             throw new Error("User not found");
+        }
+        if (user.likedTracks.length > 0) {
+            if (user.likedTracks.some((trackId) => trackId.toString() === likedSong._id.toString())) {
+                return {"error": "This song is already liked"};
+            }
         }
         user.likedTracks.push(likedSong);
         await user.save();
