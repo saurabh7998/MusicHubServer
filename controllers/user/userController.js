@@ -12,6 +12,27 @@ const UsersController = (app) => {
 
     app.post('/api/user/likedSongs', getLikedTracks);
     app.post('/api/user/like', addLikedTrack);
+    app.post('/api/user/dislike', removeLikedTrack);
+}
+
+const removeLikedTrack = async (req, res) => {
+    const {userId} = req.body;
+    const {trackId} = req.body;
+    const existingTrack = await likedSongDao.findLikedTrack(
+        {trackId: trackId});
+
+    const userDetails = await userDao.findUserById(userId);
+
+    const index = userDetails.likedTracks.indexOf(existingTrack._id);
+    if (index !== -1) {
+        userDetails.likedTracks.splice(index, 1);
+    }
+    if (existingTrack.likedBy.length === 0) {
+        await existingTrack.remove();
+    }
+    await userDetails.save();
+
+    return res.json(userDetails);
 
 }
 

@@ -2,8 +2,32 @@ import * as likedSongDao from './likedSongDao.js'
 
 const likedSongController = (app) => {
     app.post('/api/like', likeTrack);
-    app.delete('/api/like/:uid/:tid', dislikeTrack);
+    app.post('/api/dislike', dislikeTrack);
     app.get('/api/liked', getLikedTracks);
+}
+
+const dislikeTrack = async (req, res) => {
+    const {trackId} = req.body;
+    const {user} = req.body;
+    try {
+        const track = await likedSongDao.findLikedTrack({trackId});
+        if (!track) {
+            return res.status(404).json({error: 'Track not found'});
+        }
+
+        const index = track.likedBy.indexOf(user._id);
+        if (index !== -1) {
+            track.likedBy.splice(index, 1);
+        }
+        await track.save();
+        return res.status(200).json({
+                                        message: 'Track disliked successfully',
+                                        track: track,
+                                    });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({message: 'Internal server error'});
+    }
 }
 
 const getLikedTracks = async (req, res) => {
@@ -75,31 +99,31 @@ const likeTrack = async (req, res) => {
     }
 };
 
-export const dislikeTrack = async (req, res) => {
-    const id = req.params.tid
-    const userId = req.params.uid
-    try {
-        // Find the track by its trackId
-        const track = await likedSongDao.findLikedTrack({trackId: id});
-
-        if (!track) {
-            // Handle the case if the track does not exist
-            res.json("Song does not exist");
-        }
-
-        // Remove the user from the likedBy list (users list) for that track
-        const index = track.likedBy.indexOf(userId);
-        if (index > -1) {
-            track.likedBy.splice(index, 1);
-            await likedSongDao.saveLikedTrack(track); // Assuming you have a
-                                                      // method to save the
-                                                      // updated track in the
-                                                      // likedSongDao
-        }
-    } catch (error) {
-        // Handle any errors that occur during the deletion process
-        console.error('Error deleting liked song:', error);
-    }
-};
+// export const dislikeTrack = async (req, res) => {
+//     const id = req.params.tid
+//     const userId = req.params.uid
+//     try {
+//         // Find the track by its trackId
+//         const track = await likedSongDao.findLikedTrack({trackId: id});
+//
+//         if (!track) {
+//             // Handle the case if the track does not exist
+//             res.json("Song does not exist");
+//         }
+//
+//         // Remove the user from the likedBy list (users list) for that track
+//         const index = track.likedBy.indexOf(userId);
+//         if (index > -1) {
+//             track.likedBy.splice(index, 1);
+//             await likedSongDao.saveLikedTrack(track); // Assuming you have a
+//                                                       // method to save the
+//                                                       // updated track in the
+//                                                       // likedSongDao
+//         }
+//     } catch (error) {
+//         // Handle any errors that occur during the deletion process
+//         console.error('Error deleting liked song:', error);
+//     }
+// };
 
 export default likedSongController;
